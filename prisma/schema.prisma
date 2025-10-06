@@ -26,17 +26,21 @@ model User {
   projects   Project[] @relation("UserProjects")
   tasks      Task[]    @relation("UserTasks")
   comments   Comment[]
+
+  @@map("user")
 }
 
 model Team {
   id          Int           @id @default(autoincrement())
-  name        String
+  name        String        @unique
   description String?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
   members     TeamMember[]
   projects    Project[]
+
+  @@map("team")
 }
 
 model TeamMember {
@@ -49,6 +53,8 @@ model TeamMember {
   team Team @relation(fields: [teamId], references: [id])
 
   @@unique([userId, teamId])
+
+  @@map("team_member")
 }
 
 model Project {
