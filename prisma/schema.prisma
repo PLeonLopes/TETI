@@ -1,0 +1,101 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  teams      TeamMember[]
+  projects   Project[] @relation("UserProjects")
+  tasks      Task[]    @relation("UserTasks")
+  comments   Comment[]
+
+  @@map("user")
+}
+
+model Team {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  members     TeamMember[]
+  projects    Project[]
+
+  @@map("team")
+}
+
+model TeamMember {
+  id      Int    @id @default(autoincrement())
+  role    String @default("member")
+  userId  Int
+  teamId  Int
+
+  user User @relation(fields: [userId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([userId, teamId])
+
+  @@map("team_member")
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  teamId      Int
+  ownerId     Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  team   Team   @relation(fields: [teamId], references: [id])
+  owner  User   @relation("UserProjects", fields: [ownerId], references: [id])
+  tasks  Task[]
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  status      String    @default("todo") // todo, doing, done
+  priority    String    @default("medium") // low, medium, high
+  dueDate     DateTime?
+  projectId   Int
+  assignedId  Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  project   Project @relation(fields: [projectId], references: [id])
+  assigned  User?   @relation("UserTasks", fields: [assignedId], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  taskId    Int
+  authorId  Int
+  createdAt DateTime  @default(now())
+
+  task   Task @relation(fields: [taskId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}
