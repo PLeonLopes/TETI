@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { teamController } from "../controllers/teamController";
+import { validate } from "../middlewares/validate";
+import { createTeamSchema, updateTeamSchema } from "../schemas/teamSchema";
 
 const router = Router();
 
@@ -58,7 +60,7 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/Team'
  */
-router.post("/team/create", teamController.createTeam);
+router.post("/team/create", validate(createTeamSchema), teamController.createTeam);
 
 /**
  * @swagger
@@ -149,7 +151,7 @@ router.get("/team/:id", teamController.getTeamById);
  *                 data:
  *                   $ref: '#/components/schemas/Team'
  */
-router.put("/team/:id", teamController.updateTeam);
+router.put("/team/:id", validate(updateTeamSchema), teamController.updateTeam);
 
 /**
  * @swagger

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { projectController } from "../controllers/projectController";
+import { validate } from "../middlewares/validate";
+import { createProjectSchema, updateProjectSchema } from "../schemas/projectSchema";
 
 const router = Router();
 
@@ -64,7 +66,7 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/Project'
  */
-router.post("/project/create", projectController.createProject);
+router.post("/project/create", validate(createProjectSchema), projectController.createProject);
 
 /**
  * @swagger
@@ -157,7 +159,7 @@ router.get("/project/:id", projectController.getProjectById);
  *                 data:
  *                   $ref: '#/components/schemas/Project'
  */
-router.put("/project/:id", projectController.updateProject);
+router.put("/project/:id", validate(updateProjectSchema), projectController.updateProject);
 
 /**
  * @swagger

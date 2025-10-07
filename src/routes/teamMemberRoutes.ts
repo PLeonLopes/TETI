@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { teamMemberController } from "../controllers/teamMemberController";
+import { validate } from "../middlewares/validate";
+import { createTeamMemberSchema, updateTeamMemberSchema } from "../schemas/teamMemberSchema";
 
 const router = Router();
 
@@ -56,7 +58,7 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/TeamMember'
  */
-router.post("/member/add", teamMemberController.addMember);
+router.post("/member/add", validate(createTeamMemberSchema), teamMemberController.addMember);
 
 /**
  * @swagger
@@ -125,7 +127,7 @@ router.get("/member/:teamId", teamMemberController.getMembersByTeam);
  *                 data:
  *                   $ref: '#/components/schemas/TeamMember'
  */
-router.put("/member/update-role", teamMemberController.updateMemberRole);
+router.put("/member/update-role", validate(updateTeamMemberSchema), teamMemberController.updateMemberRole);
 
 /**
  * @swagger

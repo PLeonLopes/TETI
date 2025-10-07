@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { taskController } from "../controllers/taskController";
+import { validate } from "../middlewares/validate";
+import { createTaskSchema, updateTaskSchema } from "../schemas/taskSchema";
 
 const router = Router();
 
@@ -76,7 +78,7 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/Task'
  */
-router.post("/task/create", taskController.createTask);
+router.post("/task/create", validate(createTaskSchema), taskController.createTask);
 
 /**
  * @swagger
@@ -172,7 +174,7 @@ router.get("/task/:id", taskController.getTaskById);
  *                 data:
  *                   $ref: '#/components/schemas/Task'
  */
-router.put("/task/:id", taskController.updateTask);
+router.put("/task/:id", validate(updateTaskSchema), taskController.updateTask);
 
 /**
  * @swagger

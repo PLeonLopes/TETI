@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { userController } from "../controllers/userController";
+import { validate } from "../middlewares/validate";
+import { createUserSchema, updateUserSchema } from "../schemas/userSchema";
 
 const router = Router();
 
@@ -63,7 +65,7 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-router.post("/user/create", userController.createUser);
+router.post("/user/create", validate(createUserSchema), userController.createUser);
 
 /**
  * @swagger
@@ -156,7 +158,7 @@ router.get("/user/:id", userController.getUserById);
  *                 data:
  *                   $ref: '#/components/schemas/User'
  */
-router.put("/user/:id", userController.updateUser);
+router.put("/user/:id", validate(updateUserSchema), userController.updateUser);
 
 /**
  * @swagger
