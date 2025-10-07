@@ -22,6 +22,21 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  
+  prisma-studio:
+    build: .
+    container_name: teti_studio
+    entrypoint: ["sh", "entrypoint.studio.sh"]
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: "no"
 
 volumes:
   postgres_data:

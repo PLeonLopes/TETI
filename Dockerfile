@@ -1,6 +1,9 @@
 # Use Node 20 como base
 FROM node:20
 
+# Instala netcat (necessário para o entrypoint)
+RUN apt-get update && apt-get install -y netcat-traditional
+
 # Diretório de trabalho
 WORKDIR /app
 
