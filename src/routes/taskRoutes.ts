@@ -78,7 +78,11 @@ const router = Router();
  *                 data:
  *                   $ref: '#/components/schemas/Task'
  */
-router.post("/task/create", validate(createTaskSchema), taskController.createTask);
+router.post(
+	"/task/create",
+	validate(createTaskSchema),
+	taskController.createTask
+);
 
 /**
  * @swagger
@@ -203,5 +207,36 @@ router.put("/task/:id", validate(updateTaskSchema), taskController.updateTask);
  *                   $ref: '#/components/schemas/Task'
  */
 router.delete("/task/:id", taskController.deleteTask);
+
+/**
+ * @swagger
+ * /projects/{projectId}/tasks:
+ *   get:
+ *     tags:
+ *       - Task
+ *     summary: Retorna todas as tarefas de um projeto
+ *     parameters:
+ *       - in: path
+ *         name: projectId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Lista de tarefas do projeto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Task'
+ */
+
+router.get("/projects/:projectId/tasks", taskController.listTasksByProject);
 
 export default router;
