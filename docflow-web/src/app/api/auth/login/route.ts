@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const API_URL = "https://teti-front-jx8y.onrender.com/";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 export async function POST(req: Request) {
 	try {
