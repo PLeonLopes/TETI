@@ -138,4 +138,5 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-/src/generated/prisma
+# talvez erro deploy, por agora comentar. 
+# /src/generated/prisma
