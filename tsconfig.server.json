@@ -9,21 +9,21 @@
     "lib": ["esnext"],
     "types": ["node"],
 
-    "allowJs": true,
     "sourceMap": true,
-    "declaration": true,
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": false,
+    "allowJs": false
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.js",
     "prisma/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "docflow-web",
-    "dist"
+    "dist",
+    "src/generated"
   ]
 }
