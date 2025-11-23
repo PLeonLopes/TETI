@@ -1,9 +1,6 @@
 # Use Node 20 como base
 FROM node:20
 
-# Instala netcat (necessário para o entrypoint)
-RUN apt-get update && apt-get install -y netcat-traditional
-
 # Diretório de trabalho
 WORKDIR /app
 
@@ -16,8 +13,14 @@ RUN npm install
 # Copia o restante do código
 COPY . .
 
+# Gera o cliente do Prisma (importante!)
+RUN npx prisma generate
+
+# Compila o TypeScript
+RUN npm run build
+
 # Expõe a porta
 EXPOSE 3000
 
-# Comando para rodar em dev com tsx
-CMD ["npm", "run", "dev"]
+# Executa o migrate e roda em prod
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run start"]
