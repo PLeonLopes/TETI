@@ -13,7 +13,7 @@ const options: swaggerJSDoc.Options = {
       description: 'API estilo Trello para gerenciamento de projetos',
     },
     servers: [
-      { url: 'http://localhost:3000' },
+      { url: '/' },
     ],
   },
   apis: ['./src/routes/*.ts', './src/controllers/*.ts'],

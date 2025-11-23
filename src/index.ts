@@ -33,7 +33,7 @@ const swaggerOptions: swaggerJSDoc.Options = {
 			description:
 				"API estilo Trello para gerenciamento de usuários, projetos e tarefas",
 		},
-		servers: [{ url: "http://localhost:3000" }],
+		servers: [{ url: "/" }],
 	},
 	apis: ["./src/routes/*.ts", "./src/controllers/*.ts"], // arquivos com comentários Swagger
 };
