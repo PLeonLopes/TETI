@@ -1,11 +1,13 @@
 services:
   api:
-    build: .
+    build:
+      context: .          # raiz do projeto
+      dockerfile: server/Dockerfile
     container_name: teti_api
     ports:
       - "3000:3000"
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
     env_file:
       - .env
@@ -24,13 +26,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   prisma-studio:
-    build: .
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     container_name: teti_studio
     entrypoint: ["sh", "entrypoint.studio.sh"]
     ports:
       - "5555:5555"
     volumes:
-      - .:/app
+      - ./server:/app
       - /app/node_modules
     env_file:
       - .env
