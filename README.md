@@ -5,7 +5,7 @@ Permite criar, organizar e acompanhar projetos e tarefas em tempo real.
 
 | <center>Kanban Visualization</center> |
 |------------------|
-| <img src="./docs/kanban.PNG" width="100%"/> |
+| <img src="./docs/kanban.png" width="100%"/> |
 
 ## 🛠 Tecnologias
 
