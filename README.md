@@ -1,10 +1,15 @@
 # DocFlow: Sistema Gerenciador de Projetos
 
-**DocFlow** é um **gerenciador de tarefas para equipes**, inspirado no Trello. Ele permite criar, organizar e acompanhar projetos e tarefas em tempo real, com API robusta e containerização completa via Docker.
+**DocFlow** é um **gerenciador de tarefas para equipes**, inspirado no Trello.  
+Permite criar, organizar e acompanhar projetos e tarefas em tempo real.
 
-
+| <center>Kanban Visualization</center> |
+|------------------|
+| <img src="./docs/kanban.PNG" width="100%"/> |
 
 ## 🛠 Tecnologias
+
+### Backend (`server/`)
 
 * **[Node.js](https://nodejs.org/pt) + [TypeScript](https://www.typescriptlang.org/)** – Backend tipado e escalável
 * **[Prisma](https://www.prisma.io/)** – ORM para PostgreSQL
@@ -13,7 +18,13 @@
 * **[Zod](https://zod.dev/)** – Validação de dados
 * **[Swagger](https://swagger.io/)** – Documentação interativa da API
 
+### Frontend (`client/`)
 
+* **[Next.js](https://nextjs.org/docs)**
+* **[React](https://react.dev/)**
+* **[React Hook Form](https://react-hook-form.com/docs)**
+* **[Zod](https://zod.dev/)** – Validação de dados
+* **[Tailwind CSS](https://tailwindcss.com/)** - (Via Tailwind v4)
 
 ## 🚀 Funcionalidades
 
@@ -22,15 +33,14 @@
 * Controle de **status**, **prioridade** e **datas de entrega**
 * Visualização do banco em tempo real com **Prisma Studio**
 * Documentação completa da API via **Swagger**
-
-
+* Frontend em Next.js consumindo a API
 
 ## ⚡ Pré-requisitos
 
 * **Docker** e **Docker Compose**
 * **[Git](https://git-scm.com/)**
 
-
+> Você **não precisa** instalar Node, npm ou PostgreSQL na máquina para rodar o projeto – tudo sobe via Docker.
 
 ## 🏗 Setup e execução
 
@@ -52,19 +62,35 @@ cp .env_example .env
 ⚠️ Edite o `.env` se necessário, preenchendo as variáveis de acordo com seu ambiente:
 
 ```env
+# Banco de dados
 POSTGRES_USER=admin
 POSTGRES_PASSWORD=admin
 POSTGRES_DB=tetidb
+
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public"
+
+# Porta da API (backend)
 PORT=3000
+
+# URL pública da API para o frontend
+NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
+> ⚠️ NEXT_PUBLIC_API_URL é usada no frontend (Next.js) para consumir a API.
+
 ### 3. Suba todos os serviços com Docker
+Tudo é orquestrado pelo docker-compose.yml na raiz.
 
 ```bash
 docker-compose up --build
 ```
 
+Isso vai subir:
+* API (Swagger) – http://localhost:3000
+* Frontend (Next.js) – http://localhost:3001
+* Prisma Studio (Visualização do banco) – http://localhost:5555
+
+> Na primeira vez, o build pode demorar um pouco, pois o Docker vai baixar imagens e instalar dependências.
 
 
 ## 📄 Documentação da API ([Swagger](https://swagger.io/))
@@ -84,105 +110,7 @@ A API possui documentação interativa:
 
 > Detalhes e exemplos completos disponíveis no Swagger.
 
-
-
-## 📊 [Prisma Studio](https://www.prisma.io/studio)
-
-* Visualize e edite os dados do banco em tempo real
-* Navegue entre tabelas e relações
-* Crie, edite ou exclua registros facilmente
-
-Acesse: `http://localhost:5555`
-
-## 🗃️ Esquema do Banco de Dados
-
-```prisma
-model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  teams      TeamMember[]
-  projects   Project[] @relation("UserProjects")
-  tasks      Task[]    @relation("UserTasks")
-  comments   Comment[]
-
-  @@map("user")
-}
-
-model Team {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
-  description String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-
-  members     TeamMember[]
-  projects    Project[]
-
-  @@map("team")
-}
-
-model TeamMember {
-  id      Int    @id @default(autoincrement())
-  role    String @default("member")
-  userId  Int
-  teamId  Int
-
-  user User @relation(fields: [userId], references: [id])
-  team Team @relation(fields: [teamId], references: [id])
-
-  @@unique([userId, teamId])
-
-  @@map("team_member")
-}
-
-model Project {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  teamId      Int
-  ownerId     Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  team   Team   @relation(fields: [teamId], references: [id])
-  owner  User   @relation("UserProjects", fields: [ownerId], references: [id])
-  tasks  Task[]
-}
-
-model Task {
-  id          Int       @id @default(autoincrement())
-  title       String
-  description String?
-  status      String    @default("todo") // todo, doing, done
-  priority    String    @default("medium") // low, medium, high
-  dueDate     DateTime?
-  projectId   Int
-  assignedId  Int?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  project   Project @relation(fields: [projectId], references: [id])
-  assigned  User?   @relation("UserTasks", fields: [assignedId], references: [id])
-  comments  Comment[]
-}
-
-model Comment {
-  id        Int       @id @default(autoincrement())
-  content   String
-  taskId    Int
-  authorId  Int
-  createdAt DateTime  @default(now())
-
-  task   Task @relation(fields: [taskId], references: [id])
-  author User @relation(fields: [authorId], references: [id])
-}
-```
-
+--- 
 
 ## 🔗 Validação com Zod
 
@@ -195,27 +123,52 @@ model Comment {
 | **Membro de time** | Role entre `member` ou `admin`, IDs válidos de usuário e time                     |
 | **Comentário**     | Conteúdo não vazio, IDs válidos de tarefa e autor                                 |
 
+## 📊 [Prisma Studio](https://www.prisma.io/studio)
+
+* Visualize e edite os dados do banco em tempo real
+* Navegue entre tabelas e relações
+* Crie, edite ou exclua registros facilmente
+
+Acesse: `http://localhost:5555`
+
 ## 🗂 Estrutura Geral do Projeto
 
-```
+```bash
 ./
-├── prisma/
-│   ├── client.ts           # Prisma Client
-│   └── schema.prisma       # Schema do banco
-├── src/
-│   ├── controllers/        # Lógica dos endpoints
-│   ├── middlewares/        # Middlewares (ex: validação)
-│   ├── routes/             # Rotas da API
-│   ├── schemas/            # Schemas de validação Zod
-│   ├── services/           # Serviços de negócio
-│   ├── utils/              # Utilitários (ex: erros)
-│   ├── index.ts            # Entrada da API
-│   └── swagger.ts          # Configuração Swagger
-├── .env_example            # Exemplo de variáveis de ambiente
-├── docker-compose.yml      # Orquestração dos containers
-├── Dockerfile              # Container da API
-├── package-lock.json
-├── package.json
-├── README.md
-└── tsconfig.json
+├── client/                  # Frontend (Next.js + React)
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── ...
+├── server/                  # Backend (Node.js + TS + Prisma)
+│   ├── prisma/
+│   │   ├── schema.prisma    # Schema do banco
+│   │   └── ...
+│   ├── src/
+│   │   ├── controllers/     # Lógica dos endpoints
+│   │   ├── middlewares/     # Middlewares (ex: validação)
+│   │   ├── routes/          # Rotas da API
+│   │   ├── schemas/         # Schemas de validação Zod
+│   │   ├── services/        # Regras de negócio
+│   │   ├── utils/           # Utilitários (ex: erros)
+│   │   └── index.ts         # Entrada da API
+│   ├── entrypoint.studio.sh # Script para Prisma Studio
+│   ├── Dockerfile           # Container da API/Studio
+│   ├── package.json
+│   └── tsconfig.json
+├── .env                     # Variáveis de ambiente
+├── .env_example             # Exemplo de variáveis de ambiente
+├── docker-compose.yml       # Orquestração dos containers
+└── README.md
 ```
+
+## Deploy (Live Demo)
+
+> **Aviso:** Os links abaixo são hospedados no [Render](https://render.com/) em ambiente gratuito e devem ficar disponíveis por cerca de **1 mês**. Após esse período, é possível que parem de funcionar.
+
+- **Frontend (Next.js)**: https://teti-front-jx8y.onrender.com/auth/login
+- **Backend (API)**: https://teti-z40i.onrender.com 
+  - **Swagger**: https://teti-z40i.onrender.com/api-docs
+
+> Como o backend está em ambiente gratuito, a **primeira requisição pode demorar alguns segundos** enquanto o servidor “acorda”.
